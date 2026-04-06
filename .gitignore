@@ -1,0 +1,84 @@
+# Fortran-specific ignores
+*.o
+*.obj
+*.mod
+*.MOD
+*.smod
+*.exe
+*.exe.stackdump
+*.f90
+*.f
+*.for
+*.ftn
+*.F
+*.F90
+*.F03
+*.F08
+
+# Build artifacts
+*.a
+*.lib
+*.dll
+*.so
+*.dylib
+
+# Module files
+*.mod
+*.MOD
+*.smod
+
+# Compiler output
+*.lst
+*.LST
+
+# Temporary files
+*.tmp
+*.temp
+*~
+.#*
+
+# IDE/Editor specific
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Log files
+*.log
+
+# Test coverage
+*.gcda
+*.gcno
+*.gcov
+
+# Documentation
+/html/
+/latex/
+/doc/
+
+# Dependencies (if using package managers)
+# .cargo/  # Rust (not Fortran)
+# node_modules/  # JavaScript (not Fortran)
+
+# Fortran package manager (fpm) specific
+fpm.toml
+Manifest
+Packages/
+._fpm/
+.fpm/
+build/
+
+# GitHub
+.github/
