@@ -1,3 +1,5 @@
 *.asm linguist-language=Assembly
 *.inc linguist-language=Assembly
 *.nasm linguist-language=Assembly
+*.bat linguist-language=Batchfile
+*.cmd linguist-language=Batchfile

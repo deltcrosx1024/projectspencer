@@ -1,18 +1,13 @@
 ; Wi-Fi channel checking module for Router Health Monitor
+; NASM syntax version
 
-.MODEL SMALL
-.STACK 100H
+; External shared data from data.asm
+extern last_wifi_channel
 
-; Extern shared data
-.EXTERN LastWifiChannel:BYTE
+global check_wifi_channel
 
-.PUBLIC CheckWifiChannel
-
-.DATA
-; Wi-Fi checking constants
-
-.CODE
-CheckWifiChannel PROC
+section .text
+check_wifi_channel:
     ; Check current Wi-Fi channel and compare to last
     ; If changed, we could set a flag or log it
     
@@ -24,41 +19,31 @@ CheckWifiChannel PROC
     ; In DOS with packet driver, we might not have direct access to Wi-Fi info
     ; This would typically require a specialized driver or higher-level interface
     
-    PUSH AX
-    PUSH BX
-    
     ; Simulate Wi-Fi channel checking
     ; In reality, this would involve querying the wireless interface
     
     ; For simulation, we'll occasionally change the channel
-    MOV AL, [LastWifiChannel]
-    CMP AL, 0
-    JE InitializeChannel
+    mov al, [last_wifi_channel]
+    cmp al, 0
+    je initialize_channel
     
     ; 95% chance of keeping same channel, 5% chance of change
-    MOV BX, 100
-    MOV AX, 95  ; 95% chance to stay same
-    ; Would call random function here
-    MOV AL, [LastWifiChannel]  ; No change for now
-    JMP DoneWifiCheck
+    ; For simplicity, we'll just keep the same channel for now
+    mov al, [last_wifi_channel]  ; No change for now
+    jmp done_wifi_check
     
-    InitializeChannel:
+initialize_channel:
     ; Set initial channel if not set
-    MOV AL, 6  ; Default to channel 6
-    JMP StoreChannel
+    mov al, 6  ; Default to channel 6
+    jmp store_channel
     
-    DoneWifiCheck:
+done_wifi_check:
     ; In a real implementation, we would:
     ; 1. Get current channel from wireless interface
     ; 2. Compare to LastWifiChannel
     ; 3. If different, log the change and update LastWifiChannel
     
     ; For now, just store the (unchanged) value
-    MOV [LastWifiChannel], AL
+    mov [last_wifi_channel], al
     
-    POP BX
-    POP AX
-    
-    RET
-CheckWifiChannel ENDP
-END
+    ret

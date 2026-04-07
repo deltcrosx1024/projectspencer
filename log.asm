@@ -1,26 +1,24 @@
 ; Logging module for Router Health Monitor
+; NASM syntax version
 
-.MODEL SMALL
-.STACK 100H
+; External shared data from data.asm
+extern log_file_handle
 
-; Extern shared data
-.EXTERN LogFileHandle:WORD
+global log_event
+global print_string
 
-.PUBLIC LogEvent
-.PUBLIC PrintString  ; Though this might be better in a separate UI module
+section .data
+    ; Log file name if we're logging to file
+    log_file_name db 'router.log', 0
+    
+    ; Messages for logging (could also be in main.asm)
+    gateway_down_msg db 'Gateway down!$'
+    wifi_change_msg db 'Wi-Fi channel changed!$'
+    signal_drop_msg db 'Signal strength dropped!$'
+    spike_msg db 'Spike detected!$'
 
-.DATA
-; Log file name if we're logging to file
-LogFileName DB 'router.log', 0
-
-; Messages for logging (could also be in main.asm)
-GatewayDownMsg DB 'Gateway down!$'
-WifiChangeMsg DB 'Wi-Fi channel changed!$'
-SignalDropMsg DB 'Signal strength dropped!$'
-SpikeMsg DB 'Spike detected!$'
-
-.CODE
-LogEvent PROC
+section .text
+log_event:
     ; Log the current event to a file or screen
     ; In this simple implementation, we'll just print to screen
     ; In a more complex version, we might write to a file
@@ -31,27 +29,24 @@ LogEvent PROC
     ; 2. Format a timestamp (would need to get current time)
     ; 3. Write to log file or display on screen
     
-    PUSH AX
-    PUSH DX
-    
     ; Simple implementation: just beep to indicate an event
     ; In reality, we'd want to log what specifically happened
     
-    MOV AH, 02h
-    MOV DL, 07h  ; Bell character
-    INT 21h
+    push ax
+    push dx
     
-    POP DX
-    POP AX
+    mov ah, 02h
+    mov dl, 07h  ; Bell character
+    int 21h
     
-    RET
-LogEvent ENDP
+    pop dx
+    pop ax
+    
+    ret
 
 ; Print string procedure (could be moved to a UI module)
-PrintString PROC
+print_string:
     ; Print string pointed to by DS:DX until '$'
-    MOV AH, 09h
-    INT 21h
-    RET
-PrintString ENDP
-END
+    mov ah, 09h
+    int 21h
+    ret

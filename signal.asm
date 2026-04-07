@@ -1,19 +1,13 @@
 ; Signal strength checking module for Router Health Monitor
+; NASM syntax version
 
-.MODEL SMALL
-.STACK 100H
+; External shared data from data.asm
+extern last_signal_level
 
-; Extern shared data
-.EXTERN LastSignalLevel:BYTE
+global check_signal_strength
 
-.PUBLIC CheckSignalStrength
-
-.DATA
-; Signal strength checking constants
-SIGNAL_DROP_THRESHOLD EQU 20  ; Consider it a drop if signal decreases by this much
-
-.CODE
-CheckSignalStrength PROC
+section .text
+check_signal_strength:
     ; Check current signal strength and compare to last
     ; If dropped significantly, we could log it
     
@@ -25,40 +19,33 @@ CheckSignalStrength PROC
     ; In DOS with packet driver, we typically don't have access to Wi-Fi signal strength
     ; This would require a specialized driver that provides this information
     
-    PUSH AX
-    PUSH BX
-    
     ; Simulate signal strength checking
     ; In reality, this would involve querying the wireless interface for signal level
     
     ; For simulation, we'll vary the signal strength somewhat randomly
-    MOV AL, [LastSignalLevel]
+    mov al, [last_signal_level]
     
     ; Simulate signal fluctuation
     ; In reality, we'd read from the wireless interface
     ; For now, we'll just decrease slowly with occasional recovery
     
-    CMP AL, 20
-    JB LowSignalRecovery  ; If very low, likely to recover
+    cmp al, 20
+    jb low_signal_recovery  ; If very low, likely to recover
     
-    NotLowSignal:
+not_low_signal:
     ; Gradually decrease signal with occasional drops
     ; 10% chance of significant drop
-    MOV BX, 100
-    MOV AX, 90  ; 90% chance of normal fluctuation
-    ; Would call random function here
     ; For simplicity, we'll just decrease slowly
-    DEC AL
-    JMP StoreSignal
+    dec al
+    jmp store_signal
     
-    LowSignalRecovery:
+low_signal_recovery:
     ; If signal is very low, likely to recover
-    MOV AX, 70  ; 70% chance of recovery
-    ; Would call random function here
-    INC AL
-    JMP StoreSignal
+    ; For simplicity, we'll just increase slowly
+    inc al
+    jmp store_signal
     
-    StoreSignal:
+store_signal:
     ; In a real implementation, we would:
     ; 1. Get current signal strength from wireless interface
     ; 2. Compare to LastSignalLevel
@@ -66,11 +53,6 @@ CheckSignalStrength PROC
     ; 4. Update LastSignalLevel
     
     ; For now, just store the value
-    MOV [LastSignalLevel], AL
+    mov [last_signal_level], al
     
-    POP BX
-    POP AX
-    
-    RET
-CheckSignalStrength ENDP
-END
+    ret
