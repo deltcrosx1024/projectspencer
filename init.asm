@@ -1,23 +1,18 @@
 ; Initialization module for Router Health Monitor
+; NASM syntax version
 
-.MODEL SMALL
-.STACK 100H
+; External shared data from data.asm
+extern last_gateway_state
+extern last_wifi_channel
+extern last_signal_level
+extern spike_counter
+extern log_file_handle
+extern delay_seconds
 
-; Extern shared data
-.EXTERN LastGatewayState:BYTE
-.EXTERN LastWifiChannel:BYTE
-.EXTERN LastSignalLevel:BYTE
-.EXTERN SpikeCounter:WORD
-.EXTERN LogFileHandle:WORD
-.EXTERN DelaySecondsVal:WORD
+global init_monitor
 
-.PUBLIC InitMonitor
-
-.DATA
-; Initialization messages if needed
-
-.CODE
-InitMonitor PROC
+section .text
+init_monitor:
     ; Initialize: get initial gateway state, Wi-Fi channel, signal strength
     ; Open log file if needed
     
@@ -29,24 +24,22 @@ InitMonitor PROC
     ; 4. Open/create log file
     
     ; Stub implementation - set defaults
-    MOV AL, 1
-    MOV [LastGatewayState], AL
+    mov al, 1
+    mov [last_gateway_state], al
     
-    MOV AL, 6   ; Default Wi-Fi channel
-    MOV [LastWifiChannel], AL
+    mov al, 6   ; Default Wi-Fi channel
+    mov [last_wifi_channel], al
     
-    MOV AL, 80  ; Default signal strength
-    MOV [LastSignalLevel], AL
+    mov al, 80  ; Default signal strength
+    mov [last_signal_level], al
     
-    MOV AX, 0
-    MOV [SpikeCounter], AX
+    mov ax, 0
+    mov [spike_counter], ax
     
-    MOV AX, 0
-    MOV [LogFileHandle], AX  ; 0 = no file open
+    mov ax, 0
+    mov [log_file_handle], ax  ; 0 = no file open
     
-    MOV AX, 5
-    MOV [DelaySecondsVal], AX
+    mov ax, 5
+    mov [delay_seconds], ax
     
-    RET
-InitMonitor ENDP
-END
+    ret

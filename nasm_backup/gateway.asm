@@ -1,13 +1,18 @@
 ; Gateway checking module for Router Health Monitor
-; NASM syntax version
 
-; External shared data from data.asm
-extern last_gateway_state
+.MODEL SMALL
+.STACK 100H
 
-global check_gateway
+; Extern shared data
+.EXTERN LastGatewayState:BYTE
 
-section .text
-check_gateway:
+.PUBLIC CheckGateway
+
+.DATA
+; Gateway checking constants if needed
+
+.CODE
+CheckGateway PROC
     ; Check if default gateway is responding
     ; Returns: AL = 1 if responding, 0 if not
     
@@ -18,6 +23,9 @@ check_gateway:
     
     ; For this template, we'll simulate with a stub
     ; In reality, this would require raw socket access or packet driver
+    
+    PUSH BX
+    PUSH CX
     
     ; Simulate gateway check - in reality, this would involve:
     ; - Getting default gateway from system (via DHCP info or routing table)
@@ -33,21 +41,30 @@ check_gateway:
     ; Simple stub: alternate between responding and not responding every few checks
     ; This is just for demonstration - replace with real implementation
     
-    mov al, [last_gateway_state]
-    cmp al, 0
-    je was_not_responding
+    MOV AL, [LastGatewayState]
+    CMP AL, 0
+    JE WasNotResponding
     
-was_responding:
+    WAS_RESPONDING:
     ; 80% chance of still responding (simulate occasional drops)
+    MOV BX, 100
+    MOV AX, 80
+    ; In reality, we'd call a random number function here
     ; For simplicity, we'll just toggle sometimes
-    mov al, 1
-    jmp done_check
+    MOV AL, 1
+    JMP DoneCheck
     
-was_not_responding:
+    WAS_NOT_RESPONDING:
     ; 20% chance of recovering (simulate occasional recovery)
-    mov al, 1  ; Most of the time recover
-    jmp done_check
+    MOV AL, 1  ; Most of the time recover
+    JMP DoneCheck
     
-done_check:
-    mov [last_gateway_state], al
-    ret
+    DoneCheck:
+    MOV [LastGatewayState], AL
+    
+    POP CX
+    POP BX
+    
+    RET
+CheckGateway ENDP
+END
