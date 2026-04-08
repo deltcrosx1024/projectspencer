@@ -9,6 +9,7 @@ extern check_wifi_channel
 extern check_signal_strength
 extern log_event
 extern print_string
+extern ExitProcess
 
 ; External shared data from data.asm
 extern last_gateway_state
@@ -27,9 +28,6 @@ section .data
 
 global main
 main:
-    mov ax, @data
-    mov ds, ax
-
     call init_monitor
 
 main_loop:
@@ -57,5 +55,10 @@ gateway_down:
     call log_event
     jmp main_loop
 
-; Note: In a real NASM Windows program, we'd need a proper entry point
-; and would need to call ExitProcess to terminate properly
+    ; Note: In a real application, we'd have a way to exit the loop
+    ; For now, we'll just return (though this creates an infinite loop)
+    ; A proper implementation would check for a termination condition
+    
+    ; Exit the program
+    mov eax, 0
+    call ExitProcess

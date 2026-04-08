@@ -4,10 +4,10 @@
 extern ExitProcess
 extern Sleep
 
-global delay_seconds
+global do_delay
 
 section .text
-delay_seconds:
+do_delay:
     ; Delay for AX seconds
     ; Using Windows Sleep function (milliseconds)
     ; Input: AX = seconds to delay

@@ -37,6 +37,10 @@ initialize_channel:
     mov al, 6  ; Default to channel 6
     jmp store_channel
     
+store_channel:
+    ; Store the channel value
+    mov [last_wifi_channel], al
+    
 done_wifi_check:
     ; In a real implementation, we would:
     ; 1. Get current channel from wireless interface
