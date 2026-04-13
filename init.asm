@@ -1,5 +1,5 @@
 ; Initialization module for Router Health Monitor
-; NASM syntax version
+; NASM syntax version for 64-bit Windows
 
 ; External shared data from data.asm
 extern last_gateway_state
@@ -24,22 +24,16 @@ init_monitor:
     ; 4. Open/create log file
     
     ; Stub implementation - set defaults
-    mov al, 1
-    mov [last_gateway_state], al
+    mov dword [last_gateway_state], 1
     
-    mov al, 6   ; Default Wi-Fi channel
-    mov [last_wifi_channel], al
+    mov dword [last_wifi_channel], 6   ; Default Wi-Fi channel
     
-    mov al, 80  ; Default signal strength
-    mov [last_signal_level], al
+    mov dword [last_signal_level], 80  ; Default signal strength
     
-    mov ax, 0
-    mov [spike_counter], ax
+    mov dword [spike_counter], 0
     
-    mov ax, 0
-    mov [log_file_handle], ax  ; 0 = no file open
+    mov dword [log_file_handle], 0  ; 0 = no file open
     
-    mov ax, 5
-    mov [delay_seconds], ax
+    mov dword [delay_seconds], 5
     
     ret

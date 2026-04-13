@@ -8,7 +8,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-rem Assemble all modules
+rem Assemble all modules for 64-bit Windows
 echo Assembling modules...
 nasm -f win64 main.asm -o main.obj
 nasm -f win64 data.asm -o data.obj
@@ -22,7 +22,7 @@ nasm -f win64 log.asm -o log.obj
 rem Link all object files
 rem Using ld from MinGW-w64 (adjust path if needed)
 echo Linking...
-ld -e main -o router_monitor.exe main.obj data.obj init.obj delay.obj gateway.obj wifi.obj signal.obj log.obj kernel32.lib
+ld -e main -o router_monitor.exe main.obj data.obj init.obj delay.obj gateway.obj wifi.obj signal.obj log.obj -L"C:/tools/mingw/mingw64/x86_64-w64-mingw32/lib" -lkernel32
 
 if exist router_monitor.exe (
     echo Build complete: router_monitor.exe

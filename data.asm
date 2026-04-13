@@ -1,20 +1,20 @@
 ; Shared data variables for Router Health Monitor
-; NASM syntax version
+; NASM syntax version for 64-bit Windows
 
 section .data
     ; Variables for monitoring
-    last_gateway_state  db 0          ; 0 = not responding, 1 = responding
-    last_wifi_channel   db 0          ; Last known Wi-Fi channel
-    last_signal_level   db 0          ; Last known signal strength (0-100)
-    spike_counter       dw 0          ; Counter for spikes
-    log_file_handle     dw 0          ; Handle for log file (if implemented)
-    delay_seconds       dw 5          ; Delay between checks in seconds
+    last_gateway_state  dd 0          ; 0 = not responding, 1 = responding
+    last_wifi_channel   dd 0          ; Last known Wi-Fi channel
+    last_signal_level   dd 0          ; Last known signal strength (0-100)
+    spike_counter       dd 0          ; Counter for spikes
+    log_file_handle     dd 0          ; Handle for log file (if implemented)
+    delay_seconds       dd 5          ; Delay between checks in seconds
 
-    ; Messages
-    msg_gateway_down    db 'Gateway down!', 13, 10, '$'
-    msg_wifi_change     db 'Wi-Fi channel changed!', 13, 10, '$'
-    msg_signal_drop     db 'Signal strength dropped!', 13, 10, '$'
-    msg_spike           db 'Spike detected!', 13, 10, '$'
+    ; Messages (null-terminated for Windows)
+    msg_gateway_down    db 'Gateway down!', 13, 10, 0
+    msg_wifi_change     db 'Wi-Fi channel changed!', 13, 10, 0
+    msg_signal_drop     db 'Signal strength dropped!', 13, 10, 0
+    msg_spike           db 'Spike detected!', 13, 10, 0
 
     ; Make variables accessible to other modules (equivalent to .PUBLIC in MASM)
     global last_gateway_state

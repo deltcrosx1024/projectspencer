@@ -1,5 +1,5 @@
 ; Main program for Router Health Monitor
-; NASM syntax version
+; NASM syntax version for 64-bit Windows
 ; Entry point and main monitoring loop
 
 extern init_monitor
@@ -12,27 +12,26 @@ extern print_string
 extern ExitProcess
 
 ; External shared data from data.asm
-extern last_gateway_state
-extern last_wifi_channel
-extern last_signal_level
-extern spike_counter
-extern log_file_handle
-extern delay_seconds
-
-; Messages (could also be in data.asm, but keeping here for now)
-section .data
-    gateway_down_msg    db 'Gateway down!', 13, 10, '$'
-    wifi_change_msg     db 'Wi-Fi channel changed!', 13, 10, '$'
-    signal_drop_msg     db 'Signal strength dropped!', 13, 10, '$'
-    spike_msg           db 'Spike detected!', 13, 10, '$'
+extern last_gateway_state:data
+extern last_wifi_channel:data
+extern last_signal_level:data
+extern spike_counter:data
+extern log_file_handle:data
+extern delay_seconds:data
+extern msg_gateway_down:data
+extern msg_wifi_change:data
+extern msg_signal_drop:data
+extern msg_spike:data
 
 global main
 main:
+    sub rsp, 28h          ; Shadow space for Windows x64 calling convention
     call init_monitor
+    add rsp, 28h
 
 main_loop:
     ; Delay for configured seconds
-    mov ax, [delay_seconds]  ; If delay is in data.asm
+    mov eax, [delay_seconds wrt ..]  ; If delay is in data.asm
     call delay_seconds
 
     ; Check default gateway
@@ -50,7 +49,7 @@ main_loop:
 
 gateway_down:
     ; Warn about gateway down
-    mov dx, gateway_down_msg
+    lea rcx, [msg_gateway_down wrt ..]  ; Using message from data.asm
     call print_string
     call log_event
     jmp main_loop
@@ -58,7 +57,7 @@ gateway_down:
     ; Note: In a real application, we'd have a way to exit the loop
     ; For now, we'll just return (though this creates an infinite loop)
     ; A proper implementation would check for a termination condition
-    
+
     ; Exit the program
-    mov eax, 0
+    mov ecx, 0           ; Exit code
     call ExitProcess
