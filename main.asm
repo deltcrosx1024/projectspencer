@@ -1,65 +1,63 @@
 ; Main program for Router Health Monitor
+; NASM syntax version for 64-bit Windows
 ; Entry point and main monitoring loop
 
-.MODEL SMALL
-.STACK 100H
+extern init_monitor
+extern delay_seconds
+extern check_gateway
+extern check_wifi_channel
+extern check_signal_strength
+extern log_event
+extern print_string
+extern ExitProcess
 
-; Externals from other modules
-EXTERN InitMonitor:NEAR
-EXTERN DelaySeconds:NEAR
-EXTERN CheckGateway:NEAR
-EXTERN CheckWifiChannel:NEAR
-EXTERN CheckSignalStrength:NEAR
-EXTERN LogEvent:NEAR
-EXTERN PrintString:NEAR
+; External shared data from data.asm
+extern last_gateway_state:data
+extern last_wifi_channel:data
+extern last_signal_level:data
+extern spike_counter:data
+extern log_file_handle:data
+extern delay_seconds:data
+extern msg_gateway_down:data
+extern msg_wifi_change:data
+extern msg_signal_drop:data
+extern msg_spike:data
 
-; Externals for data (if we put data in separate module)
-; EXTERN LastGatewayState:BYTE
-; EXTERN LastWifiChannel:BYTE
-; EXTERN LastSignalLevel:BYTE
-; EXTERN SpikeCounter:WORD
-; EXTERN LogFileHandle:WORD
-; EXTERN DelaySecondsVal:WORD
+global main
+main:
+    sub rsp, 28h          ; Shadow space for Windows x64 calling convention
+    call init_monitor
+    add rsp, 28h
 
-.DATA
-; Local data or we could put shared data in data.asm
-GatewayDownMsg DB 'Gateway down!$'
-WifiChangeMsg DB 'Wi-Fi channel changed!$'
-SignalDropMsg DB 'Signal strength dropped!$'
-SpikeMsg DB 'Spike detected!$'
-
-.CODE
-MAIN PROC
-    MOV AX, @DATA
-    MOV DS, AX
-
-    CALL InitMonitor
-
-MainLoop:
+main_loop:
     ; Delay for configured seconds
-    ; MOV AX, [DelaySecondsVal]  ; If delay is in data.asm
-    MOV AX, 5                  ; Hardcoded delay for now
-    CALL DelaySeconds
+    mov eax, [delay_seconds wrt ..]  ; If delay is in data.asm
+    call delay_seconds
 
     ; Check default gateway
-    CALL CheckGateway
-    CMP AL, 0
-    JE GatewayDown
+    call check_gateway
+    cmp al, 0
+    je gateway_down
 
     ; Check Wi-Fi channel
-    CALL CheckWifiChannel
+    call check_wifi_channel
 
     ; Check signal strength
-    CALL CheckSignalStrength
+    call check_signal_strength
 
-    JMP MainLoop
+    jmp main_loop
 
-GatewayDown:
+gateway_down:
     ; Warn about gateway down
-    LEA DX, GatewayDownMsg
-    CALL PrintString
-    CALL LogEvent
-    JMP MainLoop
+    lea rcx, [msg_gateway_down wrt ..]  ; Using message from data.asm
+    call print_string
+    call log_event
+    jmp main_loop
 
-MAIN ENDP
-END MAIN
+    ; Note: In a real application, we'd have a way to exit the loop
+    ; For now, we'll just return (though this creates an infinite loop)
+    ; A proper implementation would check for a termination condition
+
+    ; Exit the program
+    mov ecx, 0           ; Exit code
+    call ExitProcess
